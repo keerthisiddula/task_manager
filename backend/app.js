@@ -1,3 +1,4 @@
+require('dotenv').config({ path: './backend/.env' });  // Explicitly specify the path to the .env file
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -9,15 +10,17 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/taskmanager', {
+const mongoURI = process.env.MONGODB_URI;  // Ensure this is set in your environment variables
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
+// Routes
 app.get('/', (req, res) => {
-    res.send('Task Manager API is running');
-  });
-  
+  res.send('Task Manager API is running');
+});
+
 // ✅ Get all tasks
 app.get('/tasks', async (req, res) => {
   const tasks = await Task.find();
@@ -47,8 +50,8 @@ app.delete('/tasks/:id', async (req, res) => {
   res.json({ message: 'Task deleted successfully' });
 });
 
-const PORT = 5000;
+// Start server on dynamic port
+const PORT = process.env.PORT || 5000;  // Default to 5000 if PORT is not set in environment
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
